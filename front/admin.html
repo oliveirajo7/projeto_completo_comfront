@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Admin - Lista de Usuários</h2>
+
+    <input type="text" id="filtro" placeholder="Pesquisar por nome ou ID">
+    <button id="btnPesquisar">Pesquisar</button>
+    <button id="btnCriar">Criar Novo Usuário</button>
+
+    <table border="1" id="tabelaUsuarios">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="formCriar" style="display:none;">
+        <h3>Criar Usuário</h3>
+        <input type="text" id="novoNome" placeholder="Nome">
+        <input type="email" id="novoEmail" placeholder="Email">
+        <input type="password" id="novaSenha" placeholder="Senha">
+        <button id="btnSalvar">Salvar</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
