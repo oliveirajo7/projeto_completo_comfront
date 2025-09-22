@@ -1,10 +1,17 @@
 import express from "express";
-import rotaUsuario from "./rotas/rotas-usuarios.js";
+import path from "path";
 
 const app = express();
+
 app.use(express.json());
 
-// Todas rotas de /usuarios
-app.use("/usuarios", rotaUsuario);
+// Servir a pasta "front" como estática
+app.use(express.static(path.join('.', 'front')));
 
-app.listen(3000, () => console.log("Servidor rodando em http://localhost:3000"));
+// Rotas da API
+import rotaUsuario from "./rotas/rotas-usuarios.js";
+app.use('/usuarios', rotaUsuario);
+
+app.listen(3000, () => {
+  console.log("Servidor rodando em http://localhost:3000");
+});

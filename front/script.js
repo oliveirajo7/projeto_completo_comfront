@@ -11,10 +11,8 @@ if (loginForm) {
             const auth = btoa(`${email}:${senha}`);
             const res = await fetch("/usuarios/login", {
                 method: "POST",
-                headers: {
-                    "Authorization": `Basic ${auth}`,
-                    "Content-Type": "application/json"
-                }
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password: senha }) // ⚠️ chaves do JSON devem bater com backend
             });
 
             const data = await res.json();
@@ -47,11 +45,14 @@ const btnSalvar = document.getElementById("btnSalvar");
 async function carregarUsuarios(query = "") {
     if (!tabelaUsuarios) return;
     tabelaUsuarios.innerHTML = "";
+
     const res = await fetch("/usuarios");
     const usuarios = await res.json();
 
-    const filtrados = usuarios.filter(u => 
-        u.nome.includes(query) || u.id.toString() === query
+    // Corrigido: usar u.name em vez de u.nome
+    const filtrados = usuarios.filter(u =>
+        u.name.toLowerCase().includes(query.toLowerCase()) || 
+        u.id.toString() === query
     );
 
     filtrados.forEach(u => {

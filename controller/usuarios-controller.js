@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // Listar todos usuários, com opção de filtro por nome ou id
