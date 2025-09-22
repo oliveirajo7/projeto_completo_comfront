@@ -6,16 +6,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <button id="btnLogout">Logout</button>
     <h2>Admin - Lista de Usuários</h2>
 
-    <!-- Barra de pesquisa + botão criar -->
     <div class="search-container">
         <input type="text" id="filtro" placeholder="Pesquisar por nome ou ID">
         <button id="btnPesquisar">Pesquisar</button>
         <button id="btnCriar">Criar Novo Usuário</button>
     </div>
 
-    <!-- Tabela de usuários -->
     <table border="1" id="tabelaUsuarios">
         <thead>
             <tr>
@@ -29,7 +28,6 @@
         <tbody></tbody>
     </table>
 
-    <!-- Formulário de criação -->
     <div id="formCriar" style="display:none;">
         <h3>Criar Usuário</h3>
         <input type="text" id="novoNome" placeholder="Nome">
