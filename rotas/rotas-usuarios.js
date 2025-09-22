@@ -13,13 +13,13 @@ const roteador = Router();
 
 roteador.post("/login", loginUsuario);
 
-// Apenas o admin pode ver todos
+// Apenas usuários autenticados podem listar todos
 roteador.get("/", verifyUser, listarTodosUsuarios);
 
-// Outras rotas podem ficar sem middleware por enquanto
+// Outras rotas
 roteador.get("/:id", buscarUsuarioPorId);
-roteador.post("/", criarUsuario);
-roteador.patch("/:id", atualizarUsuario);
-roteador.delete("/:id", deletarUsuario);
+roteador.post("/", verifyUser, criarUsuario); // criar também exige autenticação
+roteador.patch("/:id", verifyUser, atualizarUsuario);
+roteador.delete("/:id", verifyUser, deletarUsuario);
 
 export default roteador;

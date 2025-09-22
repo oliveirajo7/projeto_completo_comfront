@@ -1,13 +1,16 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client"; 
 const prisma = new PrismaClient();
 
 // Listar todos usuários, com opção de filtro por nome ou id
 async function listarTodosUsuarios(req, res) {
     try {
-        const { nome, id } = req.query;
+        const { name, id } = req.query;
         let filtro = {};
-        if (nome) filtro.name = { contains: nome, mode: "insensitive" };
+
         if (id && !isNaN(parseInt(id))) filtro.id = parseInt(id);
+
+        // Buscar por name sem 'mode', funciona no SQLite
+        if (name) filtro.name = { contains: name.trim() };
 
         const usuarios = Object.keys(filtro).length > 0
             ? await prisma.users.findMany({ where: filtro })
@@ -78,7 +81,7 @@ async function deletarUsuario(req, res) {
     }
 }
 
-// Login (retorna dados do usuário para front)
+// Login
 async function loginUsuario(req, res) {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: "Email e senha obrigatórios" });

@@ -1,15 +1,15 @@
 import express from "express";
 import path from "path";
 
-const app = express();
+import rotaUsuario from "./rotas/rotas-usuarios.js";
 
+const app = express();
 app.use(express.json());
 
 // Servir a pasta "front" como estática
 app.use(express.static(path.join('.', 'front')));
 
 // Rotas da API
-import rotaUsuario from "./rotas/rotas-usuarios.js";
 app.use('/usuarios', rotaUsuario);
 
 app.listen(3000, () => {

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client"; 
 const prisma = new PrismaClient();
 
 export async function verifyUser(req, res, next) {
@@ -14,7 +14,7 @@ export async function verifyUser(req, res, next) {
         if (!user) return res.status(401).json({ message: "Usuário não encontrado" });
         if (user.password !== password) return res.status(401).json({ message: "Senha incorreta" });
 
-        req.user = user; // guarda o usuário logado
+        req.user = user;
         next();
     } catch (error) {
         console.error(error);
