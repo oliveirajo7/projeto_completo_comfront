@@ -1,9 +1,17 @@
-let usuarioLogado = null;
-
-// Login
-const loginForm = document.getElementById("loginForm");
+const loginForm = document.getElementById("loginForm"); 
 const mensagem = document.getElementById("mensagem");
 
+// Função para recuperar usuário logado do sessionStorage
+function recuperarUsuarioLogado() {
+    if (!window.usuarioLogado) {
+        const usuario = sessionStorage.getItem("usuarioLogado");
+        if (usuario) {
+            window.usuarioLogado = JSON.parse(usuario);
+        }
+    }
+}
+
+// Login
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -18,14 +26,14 @@ if (loginForm) {
             });
 
             const data = await res.json();
-
             if (!res.ok) {
                 mensagem.textContent = data.message || "Erro no login";
                 return;
             }
 
-            usuarioLogado = data;
-            sessionStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+            // Salvar no sessionStorage
+            window.usuarioLogado = { email, password: senha, role: data.role };
+            sessionStorage.setItem("usuarioLogado", JSON.stringify(window.usuarioLogado));
 
             if (data.role === "admin") {
                 window.location.href = "admin.html";
@@ -39,7 +47,7 @@ if (loginForm) {
     });
 }
 
-// Admin
+// Código para admin
 const tabelaUsuarios = document.getElementById("tabelaUsuarios")?.querySelector("tbody");
 const btnPesquisar = document.getElementById("btnPesquisar");
 const filtro = document.getElementById("filtro");
@@ -47,34 +55,41 @@ const btnCriar = document.getElementById("btnCriar");
 const formCriar = document.getElementById("formCriar");
 const btnSalvar = document.getElementById("btnSalvar");
 
-if (!usuarioLogado) {
-    const armazenado = sessionStorage.getItem("usuarioLogado");
-    if (armazenado) usuarioLogado = JSON.parse(armazenado);
-    else if (tabelaUsuarios) window.location.href = "index.html";
+function getAuthHeader() {
+    if (!window.usuarioLogado) return {};
+    const token = btoa(`${window.usuarioLogado.email}:${window.usuarioLogado.password}`);
+    return { "Authorization": `Basic ${token}` };
 }
 
 async function carregarUsuarios(query = "") {
-    if (!tabelaUsuarios || !usuarioLogado) return;
-    tabelaUsuarios.innerHTML = "";
+    if (!tabelaUsuarios) return;
 
-    const authToken = btoa(`${usuarioLogado.email}:${usuarioLogado.password}`);
-    let url = "/usuarios?";
-    if (query) {
-        if (!isNaN(parseInt(query))) url += "id=" + encodeURIComponent(query);
-        else url += "name=" + encodeURIComponent(query.trim());
+    recuperarUsuarioLogado();
+
+    if (!window.usuarioLogado) {
+        tabelaUsuarios.innerHTML = `<tr><td colspan="5">Faça login para ver os usuários</td></tr>`;
+        return;
     }
 
-    try {
-        const res = await fetch(url, { headers: { "Authorization": `Basic ${authToken}` } });
-        if (!res.ok) { console.error("Erro ao buscar usuários", await res.text()); return; }
+    tabelaUsuarios.innerHTML = "";
 
+    try {
+        const res = await fetch("/usuarios", { headers: getAuthHeader() });
+        if (!res.ok) throw new Error("Erro ao buscar usuários");
         const usuarios = await res.json();
-        usuarios.forEach(u => {
+
+        const filtrados = usuarios.filter(u =>
+            u.name.toLowerCase().includes(query.toLowerCase()) || 
+            u.id.toString() === query
+        );
+
+        filtrados.forEach(u => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>${u.id}</td>
                 <td>${u.name}</td>
                 <td>${u.email}</td>
+                <td>${u.age ?? ""}</td>
                 <td>
                     <button onclick="deletarUsuario(${u.id})">Deletar</button>
                 </td>
@@ -83,49 +98,59 @@ async function carregarUsuarios(query = "") {
         });
     } catch (err) {
         console.error("Erro ao carregar usuários:", err);
+        tabelaUsuarios.innerHTML = `<tr><td colspan="5">Erro ao carregar usuários</td></tr>`;
     }
 }
 
 async function deletarUsuario(id) {
     if (!confirm("Deseja deletar esse usuário?")) return;
 
-    const authToken = btoa(`${usuarioLogado.email}:${usuarioLogado.password}`);
     try {
-        const res = await fetch(`/usuarios/${id}`, { 
-            method: "DELETE",
-            headers: { "Authorization": `Basic ${authToken}` }
-        });
-        if (!res.ok) { console.error("Erro ao deletar usuário", await res.text()); return; }
-
+        await fetch(`/usuarios/${id}`, { method: "DELETE", headers: getAuthHeader() });
         carregarUsuarios(filtro.value);
-    } catch (err) { console.error("Erro ao deletar usuário:", err); }
+    } catch (err) {
+        console.error("Erro ao deletar usuário:", err);
+    }
 }
 
-btnPesquisar?.addEventListener("click", () => carregarUsuarios(filtro.value));
-btnCriar?.addEventListener("click", () => formCriar.style.display = "block");
+btnPesquisar?.addEventListener("click", () => {
+    carregarUsuarios(filtro.value);
+});
+
+btnCriar?.addEventListener("click", () => {
+    formCriar.style.display = "block";
+});
 
 btnSalvar?.addEventListener("click", async () => {
     const nome = document.getElementById("novoNome").value;
     const email = document.getElementById("novoEmail").value;
     const senha = document.getElementById("novaSenha").value;
+    const idade = document.getElementById("novaIdade").value;
 
     if (!nome || !email || !senha) { alert("Preencha todos os campos!"); return; }
 
-    const authToken = btoa(`${usuarioLogado.email}:${usuarioLogado.password}`);
     try {
         const res = await fetch("/usuarios", {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
-                "Authorization": `Basic ${authToken}`
+                ...getAuthHeader()
             },
-            body: JSON.stringify({ name: nome, email, password: senha })
+            body: JSON.stringify({ 
+                name: nome, 
+                email, 
+                password: senha, 
+                age: idade ? parseInt(idade) : null 
+            })
         });
         if (!res.ok) { console.error("Erro ao criar usuário", await res.text()); return; }
 
         formCriar.style.display = "none";
         carregarUsuarios();
-    } catch (err) { console.error("Erro ao criar usuário:", err); }
+    } catch (err) {
+        console.error("Erro ao criar usuário:", err);
+    }
 });
 
+// Carregar usuários ao abrir a página
 window.onload = () => carregarUsuarios();

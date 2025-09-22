@@ -1,11 +1,177 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Corpo da página */
 body {
-    font-family: Arial, sans-serif;
-    max-width: 600px;
-    margin: 20px auto;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #f5f6fa;
+    color: #333;
+}
+
+/* Títulos */
+h2, h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* Inputs */
+input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Botões gerais */
+button {
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* Botões principais */
+#btnCriar, #btnPesquisar, #btnSalvar {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+}
+
+#btnCriar::before { content: "➕"; }
+#btnPesquisar::before { content: "🔍"; }
+#btnSalvar::before { content: "💾"; }
+
+#btnCriar:hover, #btnPesquisar:hover, #btnSalvar:hover {
+    background-color: #2980b9;
+}
+
+/* Botão de deletar */
+button[onclick^="deletarUsuario"] {
+    background-color: #e74c3c;
+    color: white;
+    padding: 6px 12px;
+}
+
+button[onclick^="deletarUsuario"]::before { content: "🗑️"; }
+
+button[onclick^="deletarUsuario"]:hover {
+    background-color: #c0392b;
+}
+
+/* Formulários */
+form, #formCriar {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+    border-left: 5px solid #3498db;
+}
+
+/* Barra de pesquisa */
+.search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#filtro {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* Tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.1);
+}
+
+thead {
+    background-color: #3498db;
+    color: white;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+    transition: background 0.2s;
+}
+
+/* Mensagem de login */
+#mensagem {
+    color: red;
+    margin-top: 10px;
     text-align: center;
 }
 
-input, button {
-    padding: 8px;
-    margin: 5px;
+/* Responsivo simples */
+@media (max-width: 700px) {
+    .search-container {
+        flex-direction: column;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    th {
+        background-color: #3498db;
+        color: white;
+        padding: 12px;
+    }
+
+    td {
+        padding: 12px;
+        border: none;
+        position: relative;
+        padding-left: 50%;
+    }
+
+    td::before {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 45%;
+        font-weight: bold;
+    }
+
+    td:nth-of-type(1)::before { content: "ID"; }
+    td:nth-of-type(2)::before { content: "Nome"; }
+    td:nth-of-type(3)::before { content: "Email"; }
+    td:nth-of-type(4)::before { content: "Idade"; }
+    td:nth-of-type(5)::before { content: "Ações"; }
 }
